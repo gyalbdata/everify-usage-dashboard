@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>E-Verify Usage Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#1b2a22; --paper:#f6f4ec; --line:#d8d3c2;
+    --seal:#2f5d4f; --seal-light:#7fa893; --accent:#b3552e;
+    --muted:#6f6a5c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Georgia','Iowan Old Style',serif;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 60px;}
+  header{border-bottom:3px double var(--seal); padding-bottom:18px; margin-bottom:28px;}
+  .eyebrow{
+    font-family:'Courier New',monospace; letter-spacing:.18em; text-transform:uppercase;
+    font-size:11px; color:var(--accent); margin:0 0 6px;
+  }
+  h1{margin:0; font-size:34px; font-weight:700; letter-spacing:-.01em;}
+  .sub{font-family:Arial,Helvetica,sans-serif; color:var(--muted); font-size:14.5px; margin-top:8px; max-width:760px;}
+  .stat-row{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:28px 0 36px;
+  }
+  .stat{
+    border:1px solid var(--line); background:#fffdf8; padding:14px 14px 12px;
+    position:relative;
+  }
+  .stat::before{
+    content:""; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--seal);
+  }
+  .stat .num{font-size:24px; font-weight:700; font-family:Arial,sans-serif;}
+  .stat .lbl{font-family:Arial,sans-serif; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-top:4px;}
+  section{margin-bottom:42px;}
+  h2{
+    font-size:18px; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:.06em;
+    border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:18px; color:var(--seal);
+  }
+  .chart-card{
+    background:#fffdf8; border:1px solid var(--line); padding:18px 20px 8px;
+  }
+  .grid2{display:grid; grid-template-columns:1.3fr 1fr; gap:18px;}
+  .note{font-family:Arial,sans-serif; font-size:12.5px; color:var(--muted); margin-top:10px; line-height:1.5;}
+  .findings{
+    font-family:Arial,sans-serif; font-size:14.5px; line-height:1.6;
+  }
+  .findings ul{padding-left:18px;}
+  .findings li{margin-bottom:10px;}
+  .tag{
+    display:inline-block; font-family:'Courier New',monospace; font-size:10.5px;
+    background:var(--seal); color:#fff; padding:1px 6px; margin-right:6px; letter-spacing:.04em;
+  }
+  table{width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:13px;}
+  th,td{text-align:left; padding:6px 10px; border-bottom:1px solid var(--line);}
+  th{font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);}
+  tr:hover td{background:#efeadb;}
+  .num-cell{text-align:right; font-variant-numeric:tabular-nums;}
+  footer{font-family:Arial,sans-serif; font-size:11px; color:var(--muted); text-align:center; margin-top:40px;}
+  canvas{max-height:420px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">U.S. Department of Homeland Security &mdash; State-Level Filing</p>
+    <h1>E-Verify Usage Statistics</h1>
+    <p class="sub">A look at employment-verification activity across all 50 states, D.C., and four territories: who's enrolled, who's actually checking, and how the current fiscal year compares to last.</p>
+  </header>
+
+  <div class="stat-row" id="statRow"></div>
+
+  <section>
+    <h2>Cases Filed: FY2025 (Full Year) by State</h2>
+    <div class="chart-card">
+      <canvas id="barChart"></canvas>
+      <p class="note">FY2026 is excluded here because the federal fiscal year began Oct 2025 and is still in progress as of June 2026 — comparing a partial year to a complete one would be misleading. See the pace comparison below instead.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Is FY2026 On Pace With FY2025?</h2>
+    <div class="chart-card">
+      <canvas id="paceChart"></canvas>
+      <p class="note">FY2026 cases (~9 months elapsed, Oct&ndash;Jun) annualized at a run-rate of &times;12/9 and compared against full FY2025 totals, for the ten largest states. Bars near the dashed line are tracking flat year-over-year; bars below it suggest a slowdown.</p>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="chart-card">
+      <h2 style="border:none;margin-bottom:6px;">Enrollment vs. Activity</h2>
+      <canvas id="scatterChart"></canvas>
+      <p class="note">Each dot is a state. X = enrolled hiring sites (scale of participation). Y = "Activity %" (share of enrolled sites that actually ran a case in the last year). Bubble size = cases run in the past 365 days.</p>
+    </div>
+    <div class="chart-card">
+      <h2 style="border:none;margin-bottom:6px;">Activity % — Top &amp; Bottom 8</h2>
+      <canvas id="activityChart"></canvas>
+    </div>
+  </section>
+
+  <section>
+    <h2>Key Findings</h2>
+    <div class="findings">
+      <ul>
+        <li><span class="tag">SCALE</span>Across all 55 jurisdictions, employers have <b>1.37M hiring sites enrolled</b> under 1.37M MOUs and ran <b>43.8M cases in FY2025</b>. The five largest filers — <b>Texas, California, Florida, Georgia, and New York</b> — together account for roughly 36% of all FY2025 cases.</li>
+        <li><span class="tag">PACE</span>FY2026 case volumes (through ~9 months) are running noticeably below an FY2025 pace in several major states even after annualizing — most visibly in <b>Georgia, Missouri, South Carolina, and Alabama</b>, where Activity % (sites actually verifying employees, vs. just enrolled) is also among the lowest in the country (14–19%). That combination suggests large blocks of enrolled employers in these states that are largely dormant.</li>
+        <li><span class="tag">ACTIVITY</span><b>Wisconsin (37.0%), Tennessee (36.3%), Iowa (35.8%) and New Hampshire (35.3%)</b> have the highest share of enrolled sites that actively verified someone in the past year. At the other end, <b>Northern Mariana Islands (11.5%), Georgia (14.2%), Alabama (17.0%) and Rhode Island (18.0%)</b> have the lowest — meaning a large fraction of their enrolled hiring sites haven't used the system recently despite being signed up.</li>
+        <li><span class="tag">EFFICIENCY</span>Cases per hiring site varies enormously: <b>Arkansas</b> stands out at ~71 cases/site in FY2025 (versus a typical 10–25 elsewhere), suggesting either very high-turnover/seasonal hiring (e.g., agriculture, poultry processing) or a concentrated set of high-volume employers relative to its modest site count.</li>
+        <li><span class="tag">SIZE ≠ INTENSITY</span>Georgia has the second-most hiring sites (333K) of any state but the lowest Activity % among states (14.2%) — a much weaker activity rate than peers of similar size like California (25.4%) or Florida (33.2%), indicating Georgia's enrollment base is unusually inflated relative to ongoing use.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Full State Table (sortable by column header)</h2>
+    <div class="chart-card">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>State</th><th>Enrolled MOUs</th><th>Hiring Sites</th><th>FY2026 Cases</th><th>FY2025 Cases</th><th>Usage (365d)</th><th>Activity %</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Source: E-Verify usage statistics export, state-level. Visualization built for analysis purposes — FY2026 figures are partial-year.</footer>
+</div>
+
+<script>
+const data = [{"state": "ALABAMA", "mou": 74822, "sites": 91848, "fy26": 174338, "fy25": 817110, "usage365": 12735, "activity": 17.0}, {"state": "ALASKA", "mou": 2066, "sites": 4930, "fy26": 8731, "fy25": 39121, "usage365": 632, "activity": 30.6}, {"state": "ARIZONA", "mou": 71870, "sites": 121626, "fy26": 259201, "fy25": 1163006, "usage365": 15544, "activity": 21.6}, {"state": "ARKANSAS", "mou": 5532, "sites": 18775, "fy26": 287142, "fy25": 1327324, "usage365": 1716, "activity": 31.0}, {"state": "CALIFORNIA", "mou": 111868, "sites": 320242, "fy26": 893527, "fy25": 3646502, "usage365": 28382, "activity": 25.4}, {"state": "COLORADO", "mou": 23572, "sites": 51190, "fy26": 156585, "fy25": 661946, "usage365": 6374, "activity": 27.0}, {"state": "CONNECTICUT", "mou": 9071, "sites": 37517, "fy26": 61358, "fy25": 251932, "usage365": 2920, "activity": 32.2}, {"state": "DELAWARE", "mou": 4489, "sites": 10790, "fy26": 26542, "fy25": 102755, "usage365": 1340, "activity": 29.9}, {"state": "DIST OF COL", "mou": 6116, "sites": 17438, "fy26": 34237, "fy25": 157633, "usage365": 1958, "activity": 32.0}, {"state": "FLORIDA", "mou": 132846, "sites": 259891, "fy26": 767418, "fy25": 3358442, "usage365": 44169, "activity": 33.2}, {"state": "GEORGIA", "mou": 167564, "sites": 333217, "fy26": 943811, "fy25": 3154354, "usage365": 23823, "activity": 14.2}, {"state": "GUAM", "mou": 249, "sites": 322, "fy26": 1260, "fy25": 5032, "usage365": 84, "activity": 33.7}, {"state": "HAWAII", "mou": 2819, "sites": 4346, "fy26": 11056, "fy25": 59342, "usage365": 808, "activity": 28.7}, {"state": "IDAHO", "mou": 3860, "sites": 8799, "fy26": 51326, "fy25": 197839, "usage365": 1165, "activity": 30.2}, {"state": "ILLINOIS", "mou": 31975, "sites": 113639, "fy26": 356174, "fy25": 1503807, "usage365": 9569, "activity": 29.9}, {"state": "INDIANA", "mou": 22669, "sites": 51788, "fy26": 202368, "fy25": 901210, "usage365": 7212, "activity": 31.8}, {"state": "IOWA", "mou": 6427, "sites": 17824, "fy26": 57853, "fy25": 261960, "usage365": 2302, "activity": 35.8}, {"state": "KANSAS", "mou": 9948, "sites": 25559, "fy26": 90064, "fy25": 395767, "usage365": 2901, "activity": 29.2}, {"state": "KENTUCKY", "mou": 7695, "sites": 34359, "fy26": 90820, "fy25": 418145, "usage365": 2369, "activity": 30.8}, {"state": "LOUISIANA", "mou": 13775, "sites": 30157, "fy26": 89384, "fy25": 410995, "usage365": 3963, "activity": 28.8}, {"state": "MAINE", "mou": 2080, "sites": 4550, "fy26": 17707, "fy25": 71181, "usage365": 729, "activity": 35.0}, {"state": "MARYLAND", "mou": 20314, "sites": 63003, "fy26": 207723, "fy25": 884061, "usage365": 5395, "activity": 26.6}, {"state": "MASSACHUSETTS", "mou": 22351, "sites": 63013, "fy26": 190361, "fy25": 797357, "usage365": 7373, "activity": 33.0}, {"state": "MICHIGAN", "mou": 22271, "sites": 51896, "fy26": 240318, "fy25": 1076154, "usage365": 7620, "activity": 34.2}, {"state": "MINNESOTA", "mou": 14203, "sites": 51064, "fy26": 199697, "fy25": 746072, "usage365": 4797, "activity": 33.8}, {"state": "MISSISSIPPI", "mou": 14102, "sites": 40644, "fy26": 69168, "fy25": 349291, "usage365": 4052, "activity": 28.7}, {"state": "MISSOURI", "mou": 68973, "sites": 197340, "fy26": 217661, "fy25": 957479, "usage365": 12902, "activity": 18.7}, {"state": "MONTANA", "mou": 2113, "sites": 4155, "fy26": 13188, "fy25": 55276, "usage365": 644, "activity": 30.5}, {"state": "NEBRASKA", "mou": 11393, "sites": 25081, "fy26": 73683, "fy25": 323368, "usage365": 3486, "activity": 30.6}, {"state": "NEVADA", "mou": 8219, "sites": 15223, "fy26": 54488, "fy25": 235249, "usage365": 2106, "activity": 25.6}, {"state": "NEW HAMPSHIRE", "mou": 3245, "sites": 7247, "fy26": 22176, "fy25": 96704, "usage365": 1144, "activity": 35.3}, {"state": "NEW JERSEY", "mou": 26468, "sites": 76947, "fy26": 282604, "fy25": 918839, "usage365": 7594, "activity": 28.7}, {"state": "NEW MEXICO", "mou": 4499, "sites": 9265, "fy26": 19649, "fy25": 96176, "usage365": 1189, "activity": 26.4}, {"state": "NEW YORK", "mou": 49899, "sites": 148123, "fy26": 453486, "fy25": 2134031, "usage365": 14542, "activity": 29.1}, {"state": "NORTH CAROLINA", "mou": 42492, "sites": 107330, "fy26": 368406, "fy25": 1766636, "usage365": 14451, "activity": 34.0}, {"state": "NORTH DAKOTA", "mou": 1669, "sites": 6239, "fy26": 17006, "fy25": 72789, "usage365": 570, "activity": 34.2}, {"state": "NORTHERN MARIANA ISLANDS", "mou": 1569, "sites": 1635, "fy26": 326, "fy25": 1566, "usage365": 180, "activity": 11.5}, {"state": "OHIO", "mou": 21805, "sites": 88942, "fy26": 362046, "fy25": 1611105, "usage365": 7529, "activity": 34.5}, {"state": "OKLAHOMA", "mou": 10568, "sites": 18328, "fy26": 76463, "fy25": 360499, "usage365": 2952, "activity": 27.9}, {"state": "OREGON", "mou": 10132, "sites": 23223, "fy26": 68445, "fy25": 286739, "usage365": 3004, "activity": 29.6}, {"state": "PENNSYLVANIA", "mou": 30141, "sites": 104699, "fy26": 345347, "fy25": 1565567, "usage365": 10066, "activity": 33.4}, {"state": "PUERTO RICO", "mou": 1488, "sites": 7472, "fy26": 9836, "fy25": 48276, "usage365": 423, "activity": 28.4}, {"state": "RHODE ISLAND", "mou": 3635, "sites": 18580, "fy26": 34506, "fy25": 162351, "usage365": 653, "activity": 18.0}, {"state": "SOUTH CAROLINA", "mou": 70749, "sites": 94240, "fy26": 147961, "fy25": 745597, "usage365": 18674, "activity": 26.4}, {"state": "SOUTH DAKOTA", "mou": 1939, "sites": 7405, "fy26": 11387, "fy25": 53926, "usage365": 672, "activity": 34.7}, {"state": "TENNESSEE", "mou": 26689, "sites": 101881, "fy26": 522660, "fy25": 1990434, "usage365": 9676, "activity": 36.3}, {"state": "TEXAS", "mou": 87246, "sites": 267226, "fy26": 848204, "fy25": 3681341, "usage365": 25184, "activity": 28.9}, {"state": "UTAH", "mou": 16420, "sites": 32012, "fy26": 144922, "fy25": 662252, "usage365": 4531, "activity": 27.6}, {"state": "VERMONT", "mou": 1117, "sites": 1870, "fy26": 6680, "fy25": 20427, "usage365": 368, "activity": 32.9}, {"state": "VIRGIN ISLANDS", "mou": 179, "sites": 458, "fy26": 358, "fy25": 1632, "usage365": 40, "activity": 22.3}, {"state": "VIRGINIA", "mou": 31963, "sites": 135407, "fy26": 249597, "fy25": 1206672, "usage365": 9498, "activity": 29.7}, {"state": "WASHINGTON", "mou": 21261, "sites": 52998, "fy26": 437155, "fy25": 1237140, "usage365": 5732, "activity": 27.0}, {"state": "WEST VIRGINIA", "mou": 1829, "sites": 3962, "fy26": 15082, "fy25": 71421, "usage365": 544, "activity": 29.7}, {"state": "WISCONSIN", "mou": 10239, "sites": 30639, "fy26": 152268, "fy25": 634539, "usage365": 3789, "activity": 37.0}, {"state": "WYOMING", "mou": 2276, "sites": 3469, "fy26": 5732, "fy25": 27896, "usage365": 576, "activity": 25.3}];
+
+// ---- summary stats ----
+const tot = (k)=>data.reduce((s,r)=>s+r[k],0);
+const totMou = tot('mou'), totSites=tot('sites'), totFy25=tot('fy25'), totFy26=tot('fy26'), totUse=tot('usage365');
+const avgActivity = (tot('activity')/data.length).toFixed(1);
+
+const statRow = document.getElementById('statRow');
+const stats = [
+  [totMou.toLocaleString(), 'Enrolled MOUs'],
+  [totSites.toLocaleString(), 'Hiring Sites'],
+  [totFy25.toLocaleString(), 'FY2025 Cases (full yr)'],
+  [totFy26.toLocaleString(), 'FY2026 Cases (partial)'],
+  [avgActivity+'%', 'Avg State Activity %'],
+];
+stats.forEach(([num,lbl])=>{
+  const d = document.createElement('div');
+  d.className='stat';
+  d.innerHTML = `<div class="num">${num}</div><div class="lbl">${lbl}</div>`;
+  statRow.appendChild(d);
+});
+
+const palette = { seal:'#2f5d4f', sealLight:'#7fa893', accent:'#b3552e', muted:'#6f6a5c', ink:'#1b2a22' };
+
+// ---- Bar chart: FY2025 cases top 15 states ----
+const top15 = [...data].sort((a,b)=>b.fy25-a.fy25).slice(0,15);
+new Chart(document.getElementById('barChart'), {
+  type:'bar',
+  data:{
+    labels: top15.map(d=>d.state),
+    datasets:[{label:'FY2025 Cases', data: top15.map(d=>d.fy25), backgroundColor: palette.seal}]
+  },
+  options:{
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{font:{size:11}}},
+      y:{ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}, title:{display:true,text:'FY2025 Cases'}}
+    }
+  }
+});
+
+// ---- Pace chart: top 10 states, FY26 annualized vs FY25 ----
+const top10 = [...data].sort((a,b)=>b.fy25-a.fy25).slice(0,10);
+const annualized = top10.map(d=> d.fy26 * (12/9));
+new Chart(document.getElementById('paceChart'), {
+  type:'bar',
+  data:{
+    labels: top10.map(d=>d.state),
+    datasets:[
+      {label:'FY2025 (actual, full year)', data: top10.map(d=>d.fy25), backgroundColor: palette.sealLight},
+      {label:'FY2026 (annualized estimate)', data: annualized, backgroundColor: palette.accent},
+    ]
+  },
+  options:{
+    plugins:{legend:{position:'top', labels:{font:{family:'Arial', size:11}}}},
+    scales:{
+      y:{ticks:{callback:v=>(v/1e6).toFixed(1)+'M'}, title:{display:true,text:'Cases'}}
+    }
+  }
+});
+
+// ---- Scatter: sites vs activity, bubble = usage365 ----
+const maxUse = Math.max(...data.map(d=>d.usage365));
+new Chart(document.getElementById('scatterChart'), {
+  type:'bubble',
+  data:{
+    datasets:[{
+      label:'States',
+      data: data.map(d=>({x:d.sites, y:d.activity, r: 4 + 18*(d.usage365/maxUse), state:d.state})),
+      backgroundColor:'rgba(47,93,79,0.55)',
+      borderColor: palette.seal
+    }]
+  },
+  options:{
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:(ctx)=> `${ctx.raw.state}: ${ctx.raw.x.toLocaleString()} sites, ${ctx.raw.y}% active`}}
+    },
+    scales:{
+      x:{type:'logarithmic', title:{display:true,text:'Hiring Sites (log scale)'}},
+      y:{title:{display:true,text:'Activity %'}}
+    }
+  }
+});
+
+// ---- Activity top/bottom 8 ----
+const byActivity = [...data].sort((a,b)=>b.activity-a.activity);
+const topA = byActivity.slice(0,8);
+const botA = byActivity.slice(-8).reverse();
+const actLabels = [...topA.map(d=>d.state), ...botA.map(d=>d.state)];
+const actVals = [...topA.map(d=>d.activity), ...botA.map(d=>d.activity)];
+const actColors = [...topA.map(()=>palette.seal), ...botA.map(()=>palette.accent)];
+new Chart(document.getElementById('activityChart'), {
+  type:'bar',
+  data:{ labels: actLabels, datasets:[{data: actVals, backgroundColor: actColors}] },
+  options:{
+    indexAxis:'y',
+    plugins:{legend:{display:false}},
+    scales:{ x:{title:{display:true,text:'Activity %'}} }
+  }
+});
+
+// ---- table ----
+const tbody = document.querySelector('#dataTable tbody');
+function render(rows){
+  tbody.innerHTML = rows.map(d=>`<tr>
+    <td>${d.state}</td>
+    <td class="num-cell">${d.mou.toLocaleString()}</td>
+    <td class="num-cell">${d.sites.toLocaleString()}</td>
+    <td class="num-cell">${d.fy26.toLocaleString()}</td>
+    <td class="num-cell">${d.fy25.toLocaleString()}</td>
+    <td class="num-cell">${d.usage365.toLocaleString()}</td>
+    <td class="num-cell">${d.activity.toFixed(1)}%</td>
+  </tr>`).join('');
+}
+render([...data].sort((a,b)=>b.fy25-a.fy25));
+
+const keys = ['state','mou','sites','fy26','fy25','usage365','activity'];
+let sortDir = {};
+document.querySelectorAll('#dataTable th').forEach((th,i)=>{
+  th.style.cursor='pointer';
+  th.addEventListener('click', ()=>{
+    const k = keys[i];
+    sortDir[k] = !sortDir[k];
+    const sorted = [...data].sort((a,b)=> sortDir[k] ? (a[k]>b[k]?1:-1) : (a[k]<b[k]?1:-1));
+    render(sorted);
+  });
+});
+</script>
+</body>
+</html>
