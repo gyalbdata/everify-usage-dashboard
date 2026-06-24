@@ -9,7 +9,12 @@ An interactive dashboard analyzing employment verification activity across all 5
 
 ---
 
-## Project Background
+## Project Background<img width="618" height="872" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/3c8a42bd-eb06-4596-b16e-dbb61d45228c" />
+<img width="1752" height="707" alt="Screenshot (5)" src="https://github.com/user-attachments/assets/11119f52-b502-45bf-b872-7220afb1df92" />
+<img width="1219" height="866" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/36d2820b-08a6-4b09-aafc-967b2b2323dc" />
+<img width="1937" height="663" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/40e93178-7c42-45ee-8a8e-e93561bb0fba" />
+<img width="1734" height="865" alt="Screenshot (4)" src="https://github.com/user-attachments/assets/c62b486e-9e2c-439f-b870-78fa0f7e7823" />
+
 
 E-Verify is the U.S. federal system employers use to confirm that new hires are authorized to work in the country. States vary widely in how many employers are enrolled, how many sites are actively verifying hires, and how that activity has shifted year over year.
 
