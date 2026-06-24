@@ -2,11 +2,10 @@
 
 file:///C:/Users/sherp/Downloads/everify_dashboard.html
 
-🔗 **[Live Demo](https://your-username.github.io/everify-usage-dashboard/)** *(update this link after enabling GitHub Pages)*
+🔗 **[Live Demo]()** *(update this link after enabling GitHub Pages)*
 
 An interactive dashboard analyzing employment verification activity across all 50 U.S. states, D.C., and 4 territories — built to answer one question: **is E-Verify enrollment the same as active usage, or are there major gaps between the two?**
 
-![dashboard screenshot](assets/screenshot.png)
 
 ---
 
