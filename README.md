@@ -34,8 +34,8 @@ This project takes a state-level E-Verify usage export (enrolled MOUs, hiring si
 
 ## Tech Stack
 
-- **Excel
-- **Python
+- Excel
+- Python
 - **HTML / CSS / JavaScript** — single self-contained file, no build step
 - **Chart.js** (via CDN) — bar, dual-series comparison, logarithmic bubble scatter, and horizontal ranking charts
 - **Vanilla JS** — client-side sorting for the full data table
