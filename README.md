@@ -9,13 +9,7 @@ An interactive dashboard analyzing employment verification activity across all 5
 
 ---
 
-## Project Background<img width="618" height="872" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/3c8a42bd-eb06-4596-b16e-dbb61d45228c" />
-<img width="1752" height="707" alt="Screenshot (5)" src="https://github.com/user-attachments/assets/11119f52-b502-45bf-b872-7220afb1df92" />
-<img width="1219" height="866" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/36d2820b-08a6-4b09-aafc-967b2b2323dc" />
-<img width="1937" height="663" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/40e93178-7c42-45ee-8a8e-e93561bb0fba" />
-<img width="1734" height="865" alt="Screenshot (4)" src="https://github.com/user-attachments/assets/c62b486e-9e2c-439f-b870-78fa0f7e7823" />
-
-
+## Project Background
 E-Verify is the U.S. federal system employers use to confirm that new hires are authorized to work in the country. States vary widely in how many employers are enrolled, how many sites are actively verifying hires, and how that activity has shifted year over year.
 
 This project takes a state-level E-Verify usage export (enrolled MOUs, hiring sites, FY2025/FY2026 case counts, 365-day usage, and activity rate) and turns it into an interactive dashboard to surface patterns that aren't visible in the raw numbers — particularly the gap between *enrollment* and *actual usage*.
@@ -27,6 +21,20 @@ This project takes a state-level E-Verify usage export (enrolled MOUs, hiring si
 - **Most engaged states**: Wisconsin (37.0%), Tennessee (36.3%), and Iowa (35.8%) have the highest share of enrolled sites actively verifying new hires.
 - **Usage intensity outlier**: Arkansas averages ~71 cases per hiring site in FY2025 — far above the typical 10–25 range elsewhere, consistent with high-turnover industries like agriculture or food processing.
 - **Data integrity fix**: FY2026 in the raw data only covers ~9 months (the federal fiscal year starts in October), so a naive FY2026-vs-FY2025 comparison would look like a steep decline. The dashboard instead annualizes FY2026's run rate before comparing it to FY2025, avoiding a misleading conclusion.
+[Uploading everify_dashboard.html…]()
+<img width="1219" height="866" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/1fba75d2-923f-4350-9139-29fb5675bb07" />
+<img width="618" height="872" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/53f08692-6ca1-4cf3-912e-2a6e6dd2d1f6" />
+<img width="1937" height="663" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/3203fe5e-17cf-4e0d-a311-1522a8f263e0" />
+<img width="1752" height="707" alt="Screenshot (5)" src="https://github.com/user-attachments/assets/29ed2239-9610-4a86-a8d0-2bbf391eebf9" />
+<img width="1734" height="865" alt="Screenshot (4)" src="https://github.com/user-attachments/assets/4a5a6678-9862-47b0-a8ac-5b00a4a78051" />
+
+
+
+
+
+
+
+
 
 ## Tech Stack
 
