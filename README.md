@@ -44,22 +44,4 @@ This project takes a state-level E-Verify usage export (enrolled MOUs, hiring si
 
 E-Verify Usage Statistics, state-level export (Enrolled MOUs, Hiring Sites, FY2026 Cases, FY2025 Cases, 365-day Usage, Activity %). See [`data/everify_2026.csv`](data/everify_2026.csv).
 
-## How to Run Locally
 
-```bash
-git clone https://github.com/your-username/everify-usage-dashboard.git
-cd everify-usage-dashboard
-open index.html   # or just double-click the file
-```
-
-No dependencies to install — it runs entirely in the browser.
-
-## What I'd Do Next
-
-- Add a historical time series if multi-year data becomes available, to show real trends instead of a single snapshot
-- Add a state-vs-state comparison toggle
-- Break out territory data (Guam, Puerto Rico, etc.) into its own view since their scale skews the national charts
-
-## License
-
-MIT — see [LICENSE](LICENSE).
