@@ -22,6 +22,7 @@ This project takes a state-level E-Verify usage export (enrolled MOUs, hiring si
 - **Usage intensity outlier**: Arkansas averages ~71 cases per hiring site in FY2025 — far above the typical 10–25 range elsewhere, consistent with high-turnover industries like agriculture or food processing.
 - **Data integrity fix**: FY2026 in the raw data only covers ~9 months (the federal fiscal year starts in October), so a naive FY2026-vs-FY2025 comparison would look like a steep decline. The dashboard instead annualizes FY2026's run rate before comparing it to FY2025, avoiding a misleading conclusion.
 [Uploading everify_dashboard.html…]()
+
 <img width="1219" height="866" alt="Screenshot (3)" src="https://github.com/user-attachments/assets/1fba75d2-923f-4350-9139-29fb5675bb07" />
 <img width="618" height="872" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/53f08692-6ca1-4cf3-912e-2a6e6dd2d1f6" />
 <img width="1937" height="663" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/3203fe5e-17cf-4e0d-a311-1522a8f263e0" />
@@ -31,13 +32,10 @@ This project takes a state-level E-Verify usage export (enrolled MOUs, hiring si
 
 
 
-
-
-
-
-
 ## Tech Stack
 
+- **Excel
+- **Python
 - **HTML / CSS / JavaScript** — single self-contained file, no build step
 - **Chart.js** (via CDN) — bar, dual-series comparison, logarithmic bubble scatter, and horizontal ranking charts
 - **Vanilla JS** — client-side sorting for the full data table
